@@ -1,0 +1,8 @@
+db/
+src/rest/mydatabase
+src/rest/__pycache__/
+src/rest/rest/__pycache__/
+src/app/.eslintcache
+*.pyc
+__pycache__/
+.DS_Store

@@ -1,0 +1,23 @@
+1. What this project is
+
+This project is a small TODO application with a React frontend, a Django backend, and MongoDB as the database. The frontend runs on localhost:3000 and the backend runs on localhost:8000. The main goal is to create, fetch, and refresh todos from MongoDB. The whole setup is containerized with Docker so the app can run in a fixed environment.
+
+2. Issues faced during implementation
+
+The biggest issue was the Docker setup itself. At first the Docker engine was not running properly, so docker compose commands were not working. After that, the compose file was failing because it was depending on an environment variable for the source path, which caused an empty bind mount path. Another issue was the old Debian buster image and package repositories inside the Dockerfile. The build also got stuck for a long time because Docker had to download base images and packages from the internet. On top of that, the backend also had a Python 3.8 compatibility issue with newer type syntax, and pip/celery version mismatch problems while building the image.
+
+3. What I did and what principles I followed
+
+I first fixed the Docker setup so the project can run from the repository itself without depending on a manually set path variable. Then I cleaned up the frontend and backend code so the todo list and form work through API calls instead of hardcoded data. I used React Hooks in the frontend and moved the API calls into a separate layer so the component code stays simple. On the backend, I kept the request handling in the view and the MongoDB logic in a repository class. This follows SOLID in a simple way, especially SRP and DIP. SRP was followed by keeping UI, API calls, request validation, and database logic in separate places. DIP was followed by making the view depend on a repository abstraction instead of putting database logic directly inside the view.
+
+4. Dockerfile and docker compose explanation
+
+The Dockerfile is used to build the image for all the containers. It starts from a Python base image, installs the tools needed for the backend, React app, and MongoDB, and then installs the Python requirements. The reason the build took time is because it had to download the base image, Debian packages, Yarn, MongoDB packages, and the Python packages.
+
+The current Dockerfile is doing a few specific things. First, it uses python:3.8-buster as the base image because the backend code and the package versions in this project fit better with that older Python and Debian setup. Then it replaces /bin/sh with bash so the container can run the shell commands used later in the compose file. After that, it switches the Debian package sources to archive.debian.org because the normal buster repositories are no longer available, and that was one of the build errors I faced.
+
+Next, it installs the system tools needed by the project like curl, wget, git, nginx, and also sets up the MongoDB 4.4 repository and installs mongodb-org inside the same image. It also adds the Yarn repository and installs yarn so the React app can run inside the container too. After that, it downgrades pip to a version below 24.1 because the older requirements file has packages that pip 24.1+ does not handle properly during install. Finally, it sets the Mongo host and port environment variables, points PYTHONPATH to /src, copies src/requirements.txt into the image, and installs the Python dependencies.
+
+The docker-compose.yml file defines the 3 services: api, app, and mongo. The api service runs Django on port 8000, the app service runs the React development server on port 3000, and the mongo service runs MongoDB on port 27017. The compose file also mounts the source code into the containers so code changes show up without rebuilding everything every time. This is why the app can reload while you keep editing the files locally.
+
+Overall, Docker is being used here to make sure the same project runs in the same way on any system, without depending on the machine setup too much.

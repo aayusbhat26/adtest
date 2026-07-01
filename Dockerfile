@@ -1,9 +1,12 @@
 # set base image (host OS)
-FROM python:3.8
+FROM python:3.8-buster
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
-RUN apt-get -y update
+RUN echo "deb http://archive.debian.org/debian/ buster main" > /etc/apt/sources.list && \
+    echo "deb http://archive.debian.org/debian-security/ buster/updates main" >> /etc/apt/sources.list
+
+RUN apt-get -o Acquire::Check-Valid-Until=false -y update
 RUN apt-get install -y curl nano wget nginx git
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
@@ -14,14 +17,14 @@ RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources
 RUN ln -s /bin/echo /bin/systemctl
 RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
 RUN echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-RUN apt-get -y update
+RUN apt-get -o Acquire::Check-Valid-Until=false -y update
 RUN apt-get install -y mongodb-org
 
 # Install Yarn
 RUN apt-get install -y yarn
 
 # Install PIP
-RUN easy_install pip
+RUN python -m pip install "pip<24.1" setuptools wheel
 
 
 ENV ENV_TYPE staging

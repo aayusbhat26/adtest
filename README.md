@@ -2,14 +2,14 @@
 
 # Adbrew Test!
 
-Hello! This test is designed to specifically test your Python, React and web development skills. The task is unconventional and has a slightly contrived setup on purpose and requires you to learn basic concepts of Docker on the fly. 
+Hello! This test is designed to specifically test your Python, React and web development skills. The task is unconventional and has a slightly contrived setup on purpose and requires you to learn basic concepts of Docker on the fly.
 
 
 # Structure
 
 This repository includes code for a Docker setup with 3 containers:
 * App: This is the React dev server and runs on http://localhost:3000. The code for this resides in src/app directory.
-* API: This is the backend container that run a Django instance on http://localhost:8000. 
+* API: This is the backend container that run a Django instance on http://localhost:8000.
 * Mongo: This is a DB instance running on port 27017. Django views already have code written to connect to this instance of Mongo.
 
 We highly recommend you go through the setup in `Dockerfile` and `docker-compose.yml`. If you are able to understand and explain the setup, that will be a huge differentiator.
@@ -19,17 +19,14 @@ We highly recommend you go through the setup in `Dockerfile` and `docker-compose
 ```
 git clone https://github.com/adbrew/test.git
 ```
-2. Change into the cloned directory and set the environment variable for the code path. Replace `path_to_repository` appropriately.
+2. Change into the cloned directory.
+3. Build the containers from the repository root. This step will take a good amount of time.
 ```
-export ADBREW_CODEBASE_PATH="{path_to_repository}/test/src"
+docker compose up -d --build
 ```
-3. Build container (you only need to build containers for the first time or if you change image definition, i.e., `Dockerfile`). This step will take a good amount of time.
+4. Once the build is completed, confirm the containers are running:
 ```
-docker-compose build
-```
-4. Once the build is completed, start the containers:
-```
-docker-compose up -d
+docker ps
 ```
 5. Once complete, `docker ps` should output something like this:
 ```
@@ -52,10 +49,10 @@ e445be7efa61   adbrew_test_api     "bash -c 'cd /src/re…"   3 minutes ago   Up
 
 When you run `localhost:3000`, you would see 2 things:
 1. A form with a TODO description textbox and a submit button. On this form submission, the app should interact with the Django backend (`POST http://localhost:8000/todos`) and create a TODO in MongoDB.
-2. A list with hardcoded TODOs. This should be changed to reflect TODOs in the backend (`GET http://localhost:8000/todos`). 
+2. A list with hardcoded TODOs. This should be changed to reflect TODOs in the backend (`GET http://localhost:8000/todos`).
 3. When the form is submitted, the TODO list should refresh again and fetch latest list of TODOs from MongoDB.
 
-# Instructions [IMPORTANT] 
+# Instructions [IMPORTANT]
 1. All React code should be implemented using [React hooks](https://reactjs.org/docs/hooks-intro.html) and should not use traditional stateful React components and component lifecycle method.
 2. Do not use Django's model, serializers or SQLite DB. Persist and retrieve all data from the mongo instance. A `db` instance is already present in `views.py`.
 3. Do not bypass the Docker setup. Submissions that do not have proper docker setup will be rejected.
